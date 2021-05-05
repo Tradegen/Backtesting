@@ -49,10 +49,8 @@ router.post("/run_livetest", async (req, res, next) => {
       let direction = strategyParams.direction;
       let startTime = parseInt(strategyParams.startTime);
       let endTime = parseInt(strategyParams.endTime);
-      let entryRuleNames = strategyParams.entryConditionNames;
-        let exitRuleNames = strategyParams.exitConditionNames;
-        let entryRuleParams = strategyParams.entryConditionParams;
-        let exitRuleParams = strategyParams.exitConditionParams;
+      let initialEntryRules = strategyParams.entryConditions;
+      let initialExitRules = strategyParams.exitConditions;
       let symbols = strategyParams.symbols;
       let timeframe = parseInt(strategyParams.timeframe);
       let maxConcurrentTrades = parseInt(strategyParams.maxConcurrentTrades);
@@ -106,7 +104,7 @@ router.post("/run_livetest", async (req, res, next) => {
       for (var i = 0; i < symbols.length; i+=1)
       {
             var cloud = axios.default.create({});
-            let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbols[i] + '/range/1/day/' + dateForPreviousClosePrices + '/' + dateForPreviousClosePrices + '?unadjusted=false&sort=asc&limit=1&apiKey=APIKEY';
+            let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbols[i] + '/range/1/day/' + dateForPreviousClosePrices + '/' + dateForPreviousClosePrices + '?unadjusted=false&sort=asc&limit=1&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
 
             try 
             {
@@ -124,34 +122,38 @@ router.post("/run_livetest", async (req, res, next) => {
       }
   
       //initialize entry rules
-      let entryRules = [];
-      for (var i = 0; i < symbols.length; i+=1)
-      {
-          let rules = [];
-  
-          for (var j = 0; j < entryRuleNames.length; j+=1)
-          {
-              let factory = new RuleFactory();
-              rules.push(new factory.generateRule(entryRuleNames[j], priceHistoryBySymbol[symbols[i]], entryRuleParams[j].params));
-          }
-  
-          entryRules.push(rules);
-      }
+    let entryRules = [];
+    for (var i = 0; i < symbols.length; i+=1)
+    {
+        let rules = [];
+
+        for (var j = 0; j < initialEntryRules.length; j+=1)
+        {
+            let factory = new RuleFactory();
+            rules.push(new factory.generateRule(initialEntryRules[j].firstIndicator, initialEntryRules[j].firstIndicatorParams, 
+                                                initialEntryRules[j].secondIndicator, initialEntryRules[j].secondIndicatorParams,
+                                                initialEntryRules[j].comparator));
+        }
+
+        entryRules.push(rules);
+    }
   
       //initialize exit rules
-      let exitRules = [];
-      for (var i = 0; i < symbols.length; i+=1)
-      {
-          let rules2 = [];
-  
-          for (var j = 0; j < exitRuleNames.length; j+=1)
-          {
-              let factory2 = new RuleFactory();
-              rules2.push(new factory2.generateRule(exitRuleNames[j], priceHistoryBySymbol[symbols[i]], exitRuleParams[j].params));
-          }
-  
-          exitRules.push(rules2);
-      }
+    let exitRules = [];
+    for (var i = 0; i < symbols.length; i+=1)
+    {
+        let rules2 = [];
+
+        for (var j = 0; j < initialExitRules.length; j+=1)
+        {
+            let factory2 = new RuleFactory();
+            rules2.push(new factory2.generateRule(initialExitRules[j].firstIndicator, initialExitRules[j].firstIndicator, 
+                                                  initialExitRules[j].secondIndicator, initialExitRules[j].secondIndicatorParams,
+                                                  initialExitRules[j].comparator));
+        }
+
+        exitRules.push(rules2);
+    }
   
       var peak = previousBacktestResults.peak;
       var bottom = previousBacktestResults.bottom;
@@ -249,7 +251,7 @@ router.post("/run_livetest", async (req, res, next) => {
                       entryRules[j][k].update(currentBar);
   
                       // check if all entry conditions are met
-                      if (!(entryRules[j][k].meetsConditions()))
+                      if (!(entryRules[j][k].checkConditions()))
                       {
                           meetsEntryConditions = false;
                       }
@@ -297,7 +299,7 @@ router.post("/run_livetest", async (req, res, next) => {
                       exitRules[j][k].update(currentBar);
   
                       // check if an exit condition is met
-                      if (exitRules[j][k].meetsConditions())
+                      if (exitRules[j][k].checkConditions())
                       {
                           meetsExitConditions = true;
                       }
@@ -371,7 +373,7 @@ router.post("/run_livetest", async (req, res, next) => {
                           let price = 0.0;
   
                           var cloud = axios.default.create({});
-                            let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/1/day/' + currentDate + "/" + currentDate + '?unadjusted=false&sort=asc&limit=1&apiKey=APIKEY';
+                            let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/1/day/' + currentDate + "/" + currentDate + '?unadjusted=false&sort=asc&limit=1&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
 
                             try 
                             {
@@ -546,7 +548,7 @@ router.post("/run_livetest", async (req, res, next) => {
     let bars = [];
     let validDate = false;
     var cloud = axios.default.create({});
-    let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/' + timeframe.toString() + '/minute/' + date + '/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=APIKEY';
+    let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/' + timeframe.toString() + '/minute/' + date + '/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
     try 
     {
         let res2 = await cloud.get(url).then(function (data) {
@@ -621,7 +623,9 @@ async function updateDatabase(backtestResults, strategyID)
     strategyRef.update({
         tradeFrequency: backtestResults.tradeFrequency,
         currentMarketValue: currentMarketValue,
-        alpha: backtestResults.alpha
+        alpha: backtestResults.alpha,
+        todayChange: todayChange,
+        totalReturn: backtestResults.totalReturn
     });
 }
 
@@ -629,7 +633,7 @@ async function getSPYHistory(date)
 {
     var SPYresults = [];
     var cloud = axios.default.create({});
-    let url = 'https://api.polygon.io/v2/aggs/ticker/SPY/range/1/month/2019-12-01/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=APIKEY';
+    let url = 'https://api.polygon.io/v2/aggs/ticker/SPY/range/1/month/2019-12-01/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
     try 
     {
         let res2 = await cloud.get(url).then(function (data) {
@@ -655,10 +659,8 @@ async function getParams(strategyID)
     let symbols = [];
     let timeframe = 1;
     let maxConcurrentTrades = 0;
-    let entryConditionNames = [];
-    let exitConditionNames = [];
-    let entryConditionParams = [];
-    let exitConditionParams = [];
+    let entryConditions = [];
+    let exitConditions = [];
     let backTestResultsID = "";
     let developerID = "";
 
@@ -677,10 +679,8 @@ async function getParams(strategyID)
             symbols = document.data().symbols;
             timeframe = document.data().timeframe;
             maxConcurrentTrades = document.data().maxConcurrentTrades;
-            entryConditionNames = document.data().entryConditionNames;
-            exitConditionNames = document.data().exitConditionNames;
-            entryConditionParams = document.data().entryConditionParams;
-            exitConditionParams = document.data().exitConditionParams;
+            entryConditions = document.data().entryConditions;
+            exitConditions = document.data().exitConditions;
             backTestResultsID = document.data().backTestResultsID;
             developerID = document.data().developerID;
         }
@@ -698,10 +698,8 @@ async function getParams(strategyID)
         symbols: symbols,
         timeframe: timeframe,
         maxConcurrentTrades: maxConcurrentTrades,
-        entryConditionNames: entryConditionNames,
-        exitConditionNames: exitConditionNames,
-        entryConditionParams: entryConditionParams,
-        exitConditionParams: exitConditionParams,
+        entryConditions: entryConditions,
+        exitConditions: exitConditions,
         developerID: developerID
     }
 

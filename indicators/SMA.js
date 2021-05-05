@@ -70,6 +70,11 @@ class SMA extends Indicator {
     {
         return this.currentValue;
     }
+
+    getHistory()
+    {
+        return this.indicatorHistory;
+    }
 }
 
 module.exports = SMA;

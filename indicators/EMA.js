@@ -90,6 +90,11 @@ class EMA extends Indicator {
     {
         return this.currentValue;
     }
+
+    getHistory()
+    {
+        return this.indicatorHistory;
+    }
 }
 
 module.exports = EMA;

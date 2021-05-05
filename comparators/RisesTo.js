@@ -20,6 +20,11 @@ class RisesTo extends Comparator {
         let currentCandle = this.indicator1.getValue();
         let indicator2Value = this.indicator2.getValue();
 
+        if (currentCandle == -1)
+        {
+            return false;
+        }
+
         if (indicator2Value == -1)
         {
             return false;

@@ -130,6 +130,7 @@ async function updateDatabase(backtestResults, strategyID, hasErrors)
         backTestResultsID: backtestID,
         tradeFrequency: modifiedBacktestResults.tradeFrequency,
         alpha: modifiedBacktestResults.alpha,
+        totalReturn: modifiedBacktestResults.totalReturn,
         status: "Backtest complete"
     });
 
@@ -215,7 +216,7 @@ async function getSPYHistory(date)
 {
     var SPYresults = [];
     var cloud = axios.default.create({});
-    let url = 'https://api.polygon.io/v2/aggs/ticker/SPY/range/1/month/2019-12-01/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=APIKEY';
+    let url = 'https://api.polygon.io/v2/aggs/ticker/SPY/range/1/month/2019-12-01/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
     try 
     {
         let res2 = await cloud.get(url).then(function (data) {
@@ -226,6 +227,7 @@ async function getSPYHistory(date)
     } 
     catch (err) 
     {
+        console.log(err);
         return;
     }
 
@@ -291,7 +293,7 @@ async function runBacktest(strategyParams, availableDates)
     for (var i = 0; i < symbols.length; i+=1)
     {
         var cloud = axios.default.create({});
-        let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbols[i] + '/range/1/day/2020-01-02/2020-01-02?unadjusted=false&sort=asc&limit=1&apiKey=APIKEY';
+        let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbols[i] + '/range/1/day/2020-01-02/2020-01-02?unadjusted=false&sort=asc&limit=1&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
 
         try 
         {
@@ -744,6 +746,7 @@ async function runBacktest(strategyParams, availableDates)
         trades: trades,
         tradeFrequency: tradeFrequency,
         sharpeRatio: sharpeRatio,
+        todayChange: 0,
         alpha: alpha,
         ROIs: ROIs,
         wins: wins,
@@ -761,7 +764,7 @@ async function getChunk(symbol, start, end, timeframe)
 {
     let bars = [];
     var cloud = axios.default.create({});
-    let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/' + timeframe.toString() + '/minute/' + start + '/' + end + '?unadjusted=false&sort=asc&limit=50000&apiKey=';
+    let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/' + timeframe.toString() + '/minute/' + start + '/' + end + '?unadjusted=false&sort=asc&limit=50000&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
     try 
     {
         let res2 = await cloud.get(url).then(function (data) {

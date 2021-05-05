@@ -33,6 +33,7 @@ const ProfitTarget = require("./indicators/ProfitTarget");
 const StopLoss = require("./indicators/StopLoss");
 const NMinutes = require("./indicators/NMinutes");
 const NPercent = require("./indicators/NPercent");
+const NthCandle = require("./indicators/NthCandle");
 
 // comparators
 const Closes = require("./comparators/Closes");
@@ -54,6 +55,8 @@ const FallByAtLeast = require("./comparators/FallByAtLeast");
 const FallByAtMost = require("./comparators/FallByAtMost");
 const RiseByAtLeast = require("./comparators/RiseByAtLeast");
 const RiseByAtMost = require("./comparators/RiseByAtMost");
+const CrossesAbove = require("./comparators/CrossesAbove");
+const CrossesBelow = require("./comparators/CrossesBelow");
 
 function RuleFactory()
 {
@@ -479,6 +482,19 @@ function RuleFactory()
             }
         }
 
+        if (indicator1Name == "NthCandle" || indicator2Name == "NthCandle")
+        {
+            if (indicator1Name == "NthCandle")
+            {
+                indicator1 = new NthCandle(indicator1Params);
+            }
+
+            if (indicator2Name == "NthCandle")
+            {
+                indicator2 = new NthCandle(indicator2Params);
+            }
+        }
+
         //comparators
         if (comparatorName == "Closes")
         {
@@ -555,6 +571,14 @@ function RuleFactory()
         else if (comparatorName == "RiseByAtLeast")
         {
             comparator = new RiseByAtLeast(indicator1, indicator2)
+        }
+        else if (comparatorName == "CrossesAbove")
+        {
+            comparator = new CrossesAbove(indicator1, indicator2)
+        }
+        else if (comparatorName == "CrossesBelow")
+        {
+            comparator = new CrossesBelow(indicator1, indicator2)
         }
 
         return new Rule(indicator1, indicator2, comparator);     
