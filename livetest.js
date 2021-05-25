@@ -599,6 +599,8 @@ async function updateDatabase(backtestResults, strategyID)
 {
     let backtestID = "";
     let currentMarketValue = -1;
+    let currentPoolSize = 0;
+    let yieldGenerated = 0;
     const strategyRef = db.collection("strategies").doc(strategyID);
     const doc = await strategyRef.get().then((document) => {
     if (document.exists)
@@ -606,6 +608,8 @@ async function updateDatabase(backtestResults, strategyID)
         backtestID = document.data().backTestResultsID;
         currentMarketValue = document.data().currentMarketValue;
         credits = document.data().totalCredits;
+        currentPoolSize = document.data().currentPoolSize;
+        yieldGenerated = document.data().yieldGenerated;
     }
     });
 
@@ -615,6 +619,8 @@ async function updateDatabase(backtestResults, strategyID)
     if (currentMarketValue != -1)
     {
         currentMarketValue *= (1 + todayChange);
+        yieldGenerated += (currentPoolSize * todayChange);
+        currentPoolSize *= (1 + todayChange);
     }
 
     backtestResults.strategyID = strategyID;
@@ -625,7 +631,10 @@ async function updateDatabase(backtestResults, strategyID)
         currentMarketValue: currentMarketValue,
         alpha: backtestResults.alpha,
         todayChange: todayChange,
-        totalReturn: backtestResults.totalReturn
+        totalReturn: backtestResults.totalReturn,
+        yieldGenerated: yieldGenerated,
+        currentPoolSize: currentPoolSize,
+        todayYieldGenerated: (currentPoolSize * todayChange)
     });
 }
 
