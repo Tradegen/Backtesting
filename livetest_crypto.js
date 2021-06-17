@@ -8,8 +8,6 @@ const RuleFactory = require("./ruleFactory");
 
 const db = index.db;
 
-const API_KEY = "";
-
 router.post("/run_livetest", async (req, res, next) => {
     let strategyID = req.body.strategyID;
     let currentDate = req.body.currentDate;
@@ -311,7 +309,7 @@ async function getPriceHistory(symbol, date, timeframe)
 {
     let bars = [];
     var cloud = axios.default.create({});
-    let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/' + timeframe.toString() + '/minute/' + date + '/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=' + API_KEY;
+    let url = 'https://api.polygon.io/v2/aggs/ticker/' + symbol + '/range/' + timeframe.toString() + '/minute/' + date + '/' + date + '?unadjusted=false&sort=asc&limit=5000&apiKey=Rm1obTikWQybL7LDoH_yYojQBrrr0SQg';
     try 
     {
         let res2 = await cloud.get(url).then(function (data) {
@@ -333,7 +331,7 @@ function convertTimestampToDateString(timestamp)
     var tempDate = new Date(timestamp);
     var year = tempDate.getFullYear().toString();
     var month = (tempDate.getMonth() > 8) ? (tempDate.getMonth() + 1).toString() : "0" + (tempDate.getMonth() + 1).toString();
-    var day = (tempDate.getDay() > 8) ? (tempDate.getDay() + 1).toString() : "0" + (tempDate.getDay() + 1).toString();
+    var day = (tempDate.getDate() > 9) ? tempDate.getDate().toString() : "0" + tempDate.getDate().toString();
 
     return year + "-" + month + "-" + day;
 }
