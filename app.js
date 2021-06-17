@@ -26,7 +26,7 @@ app.use(cookieParser());
 
 // require routes to api js
 const backtestRoutes = require("./backtest_crypto");
-const livetestRoutes = require("./livetest");
+const livetestRoutes = require("./livetest_crypto");
 const ordersRoutes = require("./orders");
 
 // wire api routes
