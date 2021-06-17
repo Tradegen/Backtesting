@@ -25,12 +25,14 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // require routes to api js
-const backtestRoutes = require("./backtest");
+const backtestRoutes = require("./backtest_crypto");
 const livetestRoutes = require("./livetest");
+const ordersRoutes = require("./orders");
 
 // wire api routes
 app.use("/backtest", backtestRoutes);
 app.use("/livetest", livetestRoutes);
+app.use("/orders", ordersRoutes);
 
 // no api routes hit, so call 404 error
 app.use((req, res, next) => {

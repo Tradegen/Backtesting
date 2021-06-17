@@ -5,8 +5,6 @@ class HighOfLastNMinutes extends Indicator {
       super(params); // call the super class constructor and pass in the name parameter
       this.minutes = params[0]
       this.priceHistory = [];
-      this.timeframe = 1;
-      this.index = 1;
     }
 
     getName()
@@ -16,12 +14,6 @@ class HighOfLastNMinutes extends Indicator {
   
     update(currentCandle) {
         this.priceHistory.push(currentCandle);
-  
-        if ((typeof currentCandle.timeframe !== "undefined") && (currentCandle.timeframe > 0))
-        {
-            this.timeframe = currentCandle.timeframe;
-            this.index = Math.ceil(this.minutes/this.timeframe);
-        }
       }
 
     initialize(initialHistory)
@@ -32,25 +24,23 @@ class HighOfLastNMinutes extends Indicator {
     reset()
     {
         this.priceHistory = [];
-        this.timeframe = 1;
-        this.index = 1;
         return;
     }
 
     getValue()
     {  
-        if (this.priceHistory.length < this.index)
+        if (this.priceHistory.length < this.minutes)
         {
             return -1;
         }
 
         let highPrice = 0;
-        for (var i = this.priceHistory.length - 2; i >= this.priceHistory.length - this.index; i-=1)
+        for (var i = this.priceHistory.length - 2; i >= this.priceHistory.length - this.minutes; i-=1)
         {
             highPrice = Math.max(this.priceHistory[i].h, highPrice);
         }
 
-        return (this.priceHistory.length >= this.index) ? highPrice : -1;
+        return (this.priceHistory.length >= this.minutes) ? highPrice : -1;
     }
 }
 

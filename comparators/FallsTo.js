@@ -37,7 +37,7 @@ class FallsTo extends Comparator {
             indicator2Value = newValue;
         }
 
-        return (currentCandle.o > indicator2Value * 1.0004 && currentCandle.c < indicator2Value * 1.0002 && currentCandle.c > indicator2Value * 0.9998 && currentCandle.c < currentCandle.o);
+        return (currentCandle.o > indicator2Value * 1.001 && currentCandle.c < indicator2Value * 1.001 && currentCandle.c > indicator2Value * 0.999 && currentCandle.c < currentCandle.o);
     }
 }
 
